@@ -1,0 +1,70 @@
+Kipchakpayev Madiyar
+In the world of microservice architecture, we build out an application via a collection of services. Each service in the collection tends to meet the following criteria:
+•	Loosely coupled
+•	Maintainable and testable
+•	Can be independently deployed
+HTTP communication
+The outright leader when choosing how services will communicate with each other tends to be HTTP. In fact, we could make a case that all communication channels derive from this one. But, setting that aside, HTTP calls between services is a viable option for service-to-service communication.
+function process(name: string): Promise<boolean> {
+    /** do some ServiceA business logic
+        ....
+        ....
+    */
+    /**
+     * call ServiceB to run some different business logic
+    */
+    return fetch('https://service-b.com/api/endpoint')
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(response.statusText)
+            } else {
+                return response.json().then(({saved}) => {
+                    return saved
+                })
+            }
+        })
+}
+function asyncProcess(name: string): Promise<string> {
+    /** do some ServiceA business logic
+        ....
+        ....
+    */
+    /**
+     * call ServiceB to run some different business logic
+    */
+    return fetch('https://service-b.com/api/endpoint')
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(response.statusText)
+            } else {
+                return response.json().then(({statusUrl}) => {
+                    return statusUrl
+                })
+            }
+        })
+Message communication
+Another communication pattern we can leverage in a microservice architecture is message-based communication.
+function asyncProcessMessage(name: string): Promise<string> {
+    /** do some ServiceA business logic
+        ....
+        ....
+    */
+    /**
+     * send message to SNS that ServiceB is listening on
+    */
+    let snsClient = new AWS.SNS()
+    let params = {
+        Message: JSON.stringify({
+            'data': 'our message data'
+        }),
+        TopicArn: 'our-sns-topic-message-broker'
+    }
+
+    return snsClient.publish(params)
+        .then((response) => {
+            return response.MessageId
+        })
+}
+Implementing unit tests for ASP.NET Core Web APIs
+Unit testing involves testing a part of an application in isolation from its infrastructure and dependencies. When you unit test controller logic, only the content of a single action or method is tested, not the behavior of its dependencies or of the framework itself. Unit tests do not detect issues in the interaction between components—that is the purpose of integration testing.
+
